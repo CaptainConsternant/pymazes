@@ -4,41 +4,34 @@ import pygame
 from pygame import gfxdraw
 from pygame.locals import *
 import math
+from outils import *
 
 
 ck = (0, 0, 0)
-size = 10
+size = 5
 g_x = 600
 g_y = 400
-nb_parts = 1000
+nb_parts = 100
+flags=  HWSURFACE | DOUBLEBUF #| FULLSCREEN
 
 pygame.init()
-screen = pygame.display.set_mode((g_x, g_y), HWSURFACE | FULLSCREEN |  DOUBLEBUF)
+screen = pygame.display.set_mode((g_x, g_y), flags)
 
-def rand_col():
-    return (
-        int(random.random()*256),
-        int(random.random()*256),
-        int(random.random()*256)
-        )
 
 class Particle():
     """docstring for Particle."""
     def __init__(self, x = 0, y = 0):
         super(Particle, self).__init__()
-        self.surf = pygame.Surface((size*2, size*2))
+        self.surf = pygame.Surface((size*2+2, size*2+2))
         self.surf.fill(ck)
         self.surf.set_colorkey(ck)
-        self.color = rand_col()
-        pygame.draw.circle(self.surf, self.color, (size, size), size)
-        # pygame.gfxdraw.aacircle(self.surf, size-2, size-2, size-2, self.color)
-        # pygame.gfxdraw.filled_circle(self.surf, size-2, size-2, size-2, self.color)
-        self.surf.set_alpha(150)
+        self.color = random_color()
+        # pygame.draw.circle(self.surf, self.color, (size, size), size)
+        self.surf.set_alpha(175)
+        pygame.gfxdraw.filled_circle(self.surf, size-1, size-1, size-1, self.color)
+        pygame.gfxdraw.aacircle(self.surf, size-1, size-1, size-1, self.color)
         self.pos = [x-size,y-size]
-
-        rand_angle=random.random()*math.pi*2
-        rand_mag = random.random()
-        self.speed=[math.cos(rand_angle)*rand_mag,math.sin(rand_angle)*rand_mag]
+        self.speed=random_vector(0.1)
         # print(self.speed)
 
     def update_pos(self):
@@ -65,12 +58,10 @@ class Particle():
         ]
 
 
-
-
 run=True
+freeze = False
 particles=[Particle(300,200) for x in ['']*nb_parts]
 while run:
-    screen.fill((30,30,30))
     event = pygame.event.poll()
     if event.type == pygame.MOUSEBUTTONDOWN:
         x, y = pygame.mouse.get_pos()
@@ -82,11 +73,16 @@ while run:
 
     elif event.type == pygame.QUIT:
         run = 0
+    elif event.type == pygame.KEYDOWN:
+        if event.key == K_SPACE:
+            freeze = not freeze
 
-    for p in particles :
-        p.update_pos()
-        screen.blit(p.surf, p.get_pos())
-        # pygame.draw.circle(screen, p.color, p.get_pos(), size)
+    if not freeze:
+        for p in particles :
+            p.update_pos()
+            screen.blit(p.surf, p.get_pos())
+            # pygame.draw.circle(screen, p.color, p.get_pos(), size)
 
-    pygame.event.poll()
-    pygame.display.flip()
+        pygame.event.poll()
+        pygame.display.flip()
+        screen.fill((30,30,30))
