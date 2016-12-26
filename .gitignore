@@ -1,0 +1,11 @@
+*.pyc
+bin/
+include/
+lib/
+lib64
+share/
+db.sqlite3
+os
+pip-selfcheck.json
+pyvenv.cfg
+dump.rdb
