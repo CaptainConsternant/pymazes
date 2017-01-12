@@ -11,7 +11,7 @@ ck = (0, 0, 0)
 size = 5
 g_x = 600
 g_y = 400
-nb_parts = 100
+nb_parts = 500
 flags=  HWSURFACE | DOUBLEBUF #| FULLSCREEN
 
 pygame.init()
