@@ -10,4 +10,4 @@ pip-selfcheck.json
 pyvenv.cfg
 dump.rdb
 kivy/.buildozer/
-kivy/buildozer.spec
+

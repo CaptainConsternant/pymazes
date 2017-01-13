@@ -3,7 +3,6 @@
 Bouncing balls
 """
 
-__version__ = '0.1'
 
 from random import random
 
@@ -30,14 +29,14 @@ class Ball(Widget):
     col= ListProperty([1,1,1,ALPHA])
     def __init__(self, *args, **kwargs):
         super(Ball, self).__init__(*args, **kwargs)
-        self.col= (*random_rgb(),ALPHA)
+        self.col= random_rgb(alpha=ALPHA)
 
 
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
 
     def change_color(self):
-        self.col= (*random_rgb(),ALPHA)
+        self.col= random_rgb(alpha=ALPHA)
 
 
 
@@ -53,7 +52,7 @@ class BallsContainer(Widget):
             ball.pos = (Window.width/2,Window.height/2)
             ball.velocity = random_vector(MAX_BALL_SPEED)
 
-            # ball.col= (*random_rgb(),ALPHA)
+            # ball.col= random_rgb(alpha=ALPHA)
             self.add_widget(ball)
 
     def update(self, dt):
