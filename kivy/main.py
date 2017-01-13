@@ -2,6 +2,9 @@
 """
 Bouncing balls
 """
+
+__version__ = '0.1'
+
 from random import random
 
 from kivy.app import App
@@ -10,27 +13,32 @@ from kivy.properties import NumericProperty, ReferenceListProperty, ListProperty
 from kivy.vector import Vector
 from kivy.uix.widget import Widget
 from kivy.core.window import Window
-from outils import  random_vector
+from outils import random_vector, random_rgb
 
+from kivy.uix.scatterlayout import ScatterLayout
 
 
 DELTA_TIME = 1.0 / 60.0
 MAX_BALL_SPEED = 100.0
-
+ALPHA = 0.7
 
 class Ball(Widget):
     """Class for bouncing ball."""
     velocity_x = NumericProperty(0)
     velocity_y = NumericProperty(0)
     velocity = ReferenceListProperty(velocity_x, velocity_y)
-    col= ListProperty([1,1,1,0.5])
+    col= ListProperty([1,1,1,ALPHA])
     def __init__(self, *args, **kwargs):
         super(Ball, self).__init__(*args, **kwargs)
-        self.col= (random(),random(),random(),0.5)
+        self.col= (*random_rgb(),ALPHA)
 
 
     def update(self, dt):
         self.pos = Vector(*self.velocity) * dt + self.pos
+
+    def change_color(self):
+        self.col= (*random_rgb(),ALPHA)
+
 
 
 
@@ -40,12 +48,12 @@ class BallsContainer(Widget):
     def __init__(self, *args, **kwargs):
         super(BallsContainer, self).__init__(*args, **kwargs)
         # import pdb; pdb.set_trace()
-        for i in range(100) :
+        for i in range(50) :
             ball = Ball()
             ball.pos = (Window.width/2,Window.height/2)
             ball.velocity = random_vector(MAX_BALL_SPEED)
 
-            # ball.col= (random(),random(),random(),0.5)
+            # ball.col= (*random_rgb(),ALPHA)
             self.add_widget(ball)
 
     def update(self, dt):
@@ -69,15 +77,22 @@ class BallsContainer(Widget):
         ball.velocity = random_vector(MAX_BALL_SPEED)
         self.add_widget(ball)
 
+        balls = (c for c in self.children if isinstance(c, Ball))
+        for ball in balls:
+            ball.change_color()
+
 
 class BallsApp(App):
     """Represents the whole application."""
 
     def build(self):
         """Entry point for creating app's UI."""
-        root = BallsContainer()
-        Clock.schedule_interval(root.update, DELTA_TIME)
-        return root
+        scat = ScatterLayout()
+        bc=BallsContainer()
+        scat.add_widget(bc)
+        Clock.schedule_interval(bc.update, DELTA_TIME)
+        # return bc
+        return scat
 
 
 if __name__ == '__main__':
