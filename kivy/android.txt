@@ -1,3 +1,0 @@
-title=balls
-author=Your Name
-orientation=landscape
