@@ -1,0 +1,4 @@
+{
+    "python.formatting.provider": "black",
+    "python.pythonPath": "/home/alex/.local/share/virtualenvs/pygame-H0xknsTz/bin/python"
+}

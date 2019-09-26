@@ -8,9 +8,9 @@ from outils import *
 
 
 ck = (0, 0, 0)
-csize = 10
+csize = 20
 wall_color = (125,125,125)
-cell_color = (60,60,60)
+cell_color = (80,80,80)
 cell_current_color = (150,60,100)
 gx = 600
 gy = 400
@@ -58,7 +58,7 @@ class Cell():
 
 
 tab_cell = [[Cell(x*csize,y*csize) for y in range(int(gy/csize))] for x in range(int(gx/csize))]
-import ipdb; ipdb.set_trace()
+#import ipdb; ipdb.set_trace()
 
 randx=int(random.randrange(0,gx/csize))
 randy=int(random.randrange(0,gy/csize))
@@ -130,4 +130,4 @@ while run:
         #     pygame.draw.line(screen, wall_color, wall[0], wall[1])
         pygame.event.poll()
         pygame.display.flip()
-        screen.fill((40,40,40))
+        screen.fill((60,60,60))
