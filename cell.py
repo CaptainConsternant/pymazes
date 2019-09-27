@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from params import CELL_COLOR, HCELL_COLOR, CSIZE, WALL_COLOR
+from params import CELL_COLOR, CSIZE, WALL_COLOR
 import pygame
 from pygame import Rect
 from itertools import count
@@ -30,9 +30,6 @@ class Cell():
         self.walls_pos = [ self.wall_idx_to_pos(wall) for wall in self.walls_idx  ]
         # print(self.cid, self.walls_pos)
 
-    def neigh(self):
-        self.index_x
-        pass
 
     def show(self):
         pygame.draw.rect(self.screen,self.color, Rect((self.x,self.y),(CSIZE,CSIZE)), )
@@ -44,11 +41,7 @@ class Cell():
             textsurface = self.font.render(str(self.cid), False, (150, 150, 255))
             self.screen.blit(textsurface,(self.x+CSIZE/4,self.y+CSIZE/3))
 
-    def highlight(self):
-        col = self.color
-        self.color = HCELL_COLOR
-        self.show()
-        self.color = col
+
 
     def wall_idx_to_pos(self, arg):
         return ((arg[0][0] *CSIZE, arg[0][1] *CSIZE), (arg[1][0] *CSIZE, arg[1][1] *CSIZE))

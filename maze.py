@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-import random
+import math
 import pygame
 from pygame import gfxdraw, Rect
 from pygame.locals import K_SPACE
-import math
+from queue import LifoQueue
+import random
+
 from outils import random_color, random_rgb, random_vector
 from cell import Cell
-from params import GX, GY, CSIZE, CELL_COLOR, HCELL_COLOR, FLAGS
+from params import GX, GY, CSIZE, CELL_COLOR, HCELL_COLOR, VISITED_COLOR, FLAGS
 
 
 
@@ -24,7 +26,7 @@ class Maze(object):
 
         self.is_generated = False
         self.is_solved = False
-
+        # self.generate_by_depth_first_search()
         self.main_menu()
 
     def reset_grid(self):
@@ -33,16 +35,22 @@ class Maze(object):
         self.is_generated = False
         self.is_solved = False
 
-    def show_grid(self):
+    def show_grid(self, highlight_cells=[]):
         # self.screen.fill(CELL_COLOR)
         for cols in self.tab_cell :
             for cell in cols :
-                cell.show()
+                if cell in highlight_cells :
+                    col = cell.color
+                    cell.color = HCELL_COLOR
+                    cell.show()
+                    cell.color = col
+                else :
+                    cell.show()
     
-    def update_screen(self):
-        self.show_grid()
+    def update_screen(self, highlight_cells=[] ):
+        self.show_grid(highlight_cells=highlight_cells)
         pygame.display.flip()
-        # self.clock.tick(10) # max x fps
+        self.clock.tick(4) # max x fps
 
     def poll(self):
         event = pygame.event.poll()
@@ -53,6 +61,17 @@ class Maze(object):
             if event.key == K_SPACE:
                 self.pause = not self.pause
                 print("(Un)Pause")
+
+    def find_neighbours(self, cell):
+        neighs = []
+        cwalls_pos = set(cell.walls_pos)
+        for c in self.cell_list :
+            if c != cell and cwalls_pos.intersection(c.walls_pos) :
+                neighs.append(c)
+                if len(neighs) == 4 :
+                    break
+        # print(neighs)
+        return neighs
 
 
     def generate_by_random_merge(self):
@@ -90,7 +109,6 @@ class Maze(object):
                 if self.cell_list_potentielles :
                     selected_cell=random.choice(self.cell_list_potentielles)
                     # print(f"cell choisie {selected_cell.cid}")
-                    selected_cell.highlight()
                     deleted_wall = False
                     processable_walls = selected_cell.walls_pos[:]
                     random.shuffle(processable_walls)
@@ -112,23 +130,59 @@ class Maze(object):
                     print('end')
                     self.main_menu()
 
-                self.update_screen()
+                self.update_screen(highlight_cells=[])
+
+    def generate_by_depth_first_search(self):
+        path = LifoQueue()
+        visited_cells = []
+        current_cell = random.choice(self.cell_list)
+        path.put(current_cell)
+        while self.run:
+            self.poll()
+            if not self.pause:
+                while path.qsize():
+                    visited_cells.append(current_cell)
+                    current_cell.color = VISITED_COLOR
+                    neighs = self.find_neighbours(current_cell)
+                    # print("neighs", neighs)
+
+                    possible_neighs = [x for x in neighs if x not in visited_cells]
+                    # print("possneigs", possible_neighs)
+                    if possible_neighs :
+                        neigh = random.choice(possible_neighs)
+                        wall_to_remove = set(current_cell.walls_pos).intersection(neigh.walls_pos).pop()
+                        # print(wall_to_remove)
+                        # print(current_cell.walls_pos)
+                        # print()
+                        current_cell.walls_pos.remove(wall_to_remove)
+                        neigh.walls_pos.remove(wall_to_remove)
+                        current_cell = neigh
+                        path.put(current_cell)
+                    else :
+                        current_cell = path.get()
+
+                    self.update_screen(highlight_cells=list(path.queue))
+                print('end')
+                self.main_menu()
+
 
     def main_menu(self):
         print(f"{' MAIN MENU ':_^30}")
-        print("1. Generate by random merge")
+        print("1. Generate by random merge (Kruskal)")
+        print("2. Generate by first depths search")
         print('q. Quit')
         print()
         resp=None
-        while resp not in ['1', 'Q']:
-            resp = str(input("Please enter a number")).upper().strip()
+        while resp not in ['1', '2', 'Q']:
+            resp = str(input("Please enter a number\n")).upper().strip()
 
         if resp == "Q":
             print("Bye. Comme back soon !")
             return
         elif resp == '1' :
             self.generate_by_random_merge()
-
+        elif resp == '2' :
+            self.generate_by_depth_first_search()
     
 #import ipdb; ipdb.set_trace()
 
