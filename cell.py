@@ -30,6 +30,11 @@ class Cell():
         self.walls_pos = [ self.wall_idx_to_pos(wall) for wall in self.walls_idx  ]
         # print(self.cid, self.walls_pos)
 
+    def __str__(self):
+        return f"Cell {self.cid}"
+
+    def __repr__(self):
+        return str(self)
 
     def show(self):
         pygame.draw.rect(self.screen,self.color, Rect((self.x,self.y),(CSIZE,CSIZE)), )

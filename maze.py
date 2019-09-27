@@ -26,7 +26,7 @@ class Maze(object):
 
         self.is_generated = False
         self.is_solved = False
-        # self.generate_by_depth_first_search()
+        # self.generate_by_prims()
         self.main_menu()
 
     def reset_grid(self):
@@ -72,6 +72,16 @@ class Maze(object):
                     break
         # print(neighs)
         return neighs
+
+    def find_cells_by_wall(self, wall) :
+        print(wall)
+        cells = []
+        for c in self.cell_list :
+            if wall in c.walls_pos :
+                cells.append(c)
+                if len(cells) == 2 :
+                    break
+        return cells
 
 
     def generate_by_random_merge(self):
@@ -162,18 +172,44 @@ class Maze(object):
                         current_cell = path.get()
 
                     self.update_screen(highlight_cells=list(path.queue))
+
                 print('end')
                 self.main_menu()
+
+    def generate_by_prims(self):
+        cells_in_maze = set()
+        walls_list = set()
+        first_cell = random.choice(self.cell_list)
+        [walls_list.add(x) for x in first_cell.walls_pos]
+        cells_in_maze.add(first_cell)
+        while walls_list :
+            wall = random.sample(walls_list,1)[0]
+            cells = self.find_cells_by_wall(wall)
+            print("cells", cells)
+            if [x for x in cells if x not in cells_in_maze] :
+                for c in cells :
+                    c.walls_pos.remove(wall)
+                    [walls_list.add(w) for w in c.walls_pos]
+                    cells_in_maze.add(c)
+                    c.color= VISITED_COLOR
+
+            walls_list.remove(wall)
+            self.update_screen()
+
+
+
+
 
 
     def main_menu(self):
         print(f"{' MAIN MENU ':_^30}")
         print("1. Generate by random merge (Kruskal)")
         print("2. Generate by first depths search")
+        print("3. Generate by Prim's Algorithm")
         print('q. Quit')
         print()
         resp=None
-        while resp not in ['1', '2', 'Q']:
+        while resp not in ['1', '2', '3' 'Q']:
             resp = str(input("Please enter a number\n")).upper().strip()
 
         if resp == "Q":
@@ -183,6 +219,8 @@ class Maze(object):
             self.generate_by_random_merge()
         elif resp == '2' :
             self.generate_by_depth_first_search()
+        elif resp == '3' :
+            self.generate_by_prims()()
     
 #import ipdb; ipdb.set_trace()
 
