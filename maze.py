@@ -25,6 +25,8 @@ class Maze(object):
         self.is_generated = False
         self.is_solved = False
 
+        self.main_menu()
+
     def reset_grid(self):
         self.tab_cell = [[Cell(self.screen, x*CSIZE,y*CSIZE) for y in range(int(GY/CSIZE))] for x in range(int(GX/CSIZE))]
         self.cell_list = [item for subl in self.tab_cell for item in subl]
@@ -37,6 +39,11 @@ class Maze(object):
             for cell in cols :
                 cell.show()
     
+    def update_screen(self):
+        self.show_grid()
+        pygame.display.flip()
+        # self.clock.tick(10) # max x fps
+
     def poll(self):
         event = pygame.event.poll()
         if event.type == pygame.QUIT:
@@ -103,10 +110,24 @@ class Maze(object):
                 else :
                     self.run = False
                     print('end')
+                    self.main_menu()
 
-                self.show_grid()
-                pygame.display.flip()
-                # self.clock.tick(10) # max x fps
+                self.update_screen()
+
+    def main_menu(self):
+        print(f"{' MAIN MENU ':_^30}")
+        print("1. Generate by random merge")
+        print('q. Quit')
+        print()
+        resp=None
+        while resp not in ['1', 'Q']:
+            resp = str(input("Please enter a number")).upper().strip()
+
+        if resp == "Q":
+            print("Bye. Comme back soon !")
+            return
+        elif resp == '1' :
+            self.generate_by_random_merge()
 
     
 #import ipdb; ipdb.set_trace()
@@ -114,5 +135,4 @@ class Maze(object):
 
 if __name__ == "__main__":
     a=Maze()
-    a.generate_by_random_merge()
 
