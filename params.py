@@ -1,7 +1,13 @@
-GX = 800
+
+#!/usr/bin/env python
+from pygame.locals import HWSURFACE, DOUBLEBUF
+
+FLAGS=  HWSURFACE | DOUBLEBUF #| FULLSCREEN
+
+GX = 600
 GY = 600
 
-CSIZE = 10
+CSIZE = 20
 
 WALL_COLOR = (0,0,0)
 CELL_COLOR = (80,80,80)

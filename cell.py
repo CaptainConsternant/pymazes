@@ -6,7 +6,7 @@ from itertools import count
 
 
 class Cell():
-    """Cellule de labyrinthe"""
+    """Cell in a Maze"""
     global_cell_counter = count(0)
     def __init__(self, screen, x, y, print_ids=False):
         self.cid = next(self.global_cell_counter) # cell id
