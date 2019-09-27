@@ -182,19 +182,22 @@ class Maze(object):
         first_cell = random.choice(self.cell_list)
         [walls_list.add(x) for x in first_cell.walls_pos]
         cells_in_maze.add(first_cell)
-        while walls_list :
-            wall = random.sample(walls_list,1)[0]
-            cells = self.find_cells_by_wall(wall)
-            print("cells", cells)
-            if [x for x in cells if x not in cells_in_maze] :
-                for c in cells :
-                    c.walls_pos.remove(wall)
-                    [walls_list.add(w) for w in c.walls_pos]
-                    cells_in_maze.add(c)
-                    c.color= VISITED_COLOR
+        while self.run:
+            self.poll()
+            if not self.pause:
+                while walls_list :
+                    wall = random.sample(walls_list,1)[0]
+                    cells = self.find_cells_by_wall(wall)
+                    # print("cells", cells)
+                    if [x for x in cells if x not in cells_in_maze] :
+                        for c in cells :
+                            c.walls_pos.remove(wall)
+                            [walls_list.add(w) for w in c.walls_pos]
+                            cells_in_maze.add(c)
+                            c.color= VISITED_COLOR
 
-            walls_list.remove(wall)
-            self.update_screen()
+                    walls_list.remove(wall)
+                    self.update_screen()
 
 
 
@@ -209,7 +212,7 @@ class Maze(object):
         print('q. Quit')
         print()
         resp=None
-        while resp not in ['1', '2', '3' 'Q']:
+        while resp not in ['1', '2', '3', 'Q']:
             resp = str(input("Please enter a number\n")).upper().strip()
 
         if resp == "Q":
@@ -220,7 +223,7 @@ class Maze(object):
         elif resp == '2' :
             self.generate_by_depth_first_search()
         elif resp == '3' :
-            self.generate_by_prims()()
+            self.generate_by_prims()
     
 #import ipdb; ipdb.set_trace()
 
