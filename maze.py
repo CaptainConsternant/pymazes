@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+from collections import Counter
 import math
 import pygame
 from pygame import gfxdraw, Rect
 from pygame.locals import K_SPACE
 from queue import LifoQueue
 import random
+import sys
 
 from outils import random_color, random_rgb, random_vector
 from cell import Cell
@@ -26,7 +28,7 @@ class Maze(object):
 
         self.is_generated = False
         self.is_solved = False
-        # self.generate_by_prims()
+        self.generate_by_wilson()
         self.main_menu()
 
     def reset_grid(self):
@@ -50,7 +52,7 @@ class Maze(object):
     def update_screen(self, highlight_cells=[] ):
         self.show_grid(highlight_cells=highlight_cells)
         pygame.display.flip()
-        self.clock.tick(4) # max x fps
+        # self.clock.tick(4) # max x fps
 
     def poll(self):
         event = pygame.event.poll()
@@ -74,7 +76,7 @@ class Maze(object):
         return neighs
 
     def find_cells_by_wall(self, wall) :
-        print(wall)
+        # print(wall)
         cells = []
         for c in self.cell_list :
             if wall in c.walls_pos :
@@ -198,7 +200,68 @@ class Maze(object):
 
                     walls_list.remove(wall)
                     self.update_screen()
+                
+                print('end')
+                self.main_menu()
 
+
+    def generate_by_wilson(self):
+        cells_not_maze = set(self.cell_list)
+        cells_in_maze = set()
+
+        cell = random.choice(self.cell_list)
+        # cells_not_maze.remove(cell)
+        cells_in_maze.add(cell)
+        # input("cells in maze %s" % cells_in_maze )
+
+        def cut_loops_in_path(path, large_cuts=True):
+            # with large cut we cut the loop from the first occurence to the last occurence [0,1,2,3,1,2,3,1,7,4] cut 1 -> [0,1,7,4]
+            # without we cut occurences in order of occurence [0,1,2,3,1,2,3,1,7,4] cut 1 -> [0,1,2,3,1,7,4]
+            duplicates = True  
+            while duplicates :
+                duplicates = [x for x,y in Counter(path).items() if y >1]
+                if duplicates :
+                    elem = duplicates[0]
+                    print('removing ', elem)
+                    first_index = path.index(elem)
+                    if large_cuts :
+                        last_index = len(path)-1 - path[::-1].index(elem)
+                    else :
+                        last_index = path.index(elem, first_index + 1)
+                    path = path[:first_index] + path[last_index:]
+            return path
+        
+        while cells_not_maze :
+            cell = random.sample(cells_not_maze,1)[0]
+            #lets start a path
+            path = []
+
+            while True : 
+                neighs = self.find_neighbours(cell)
+                candidate = random.choice(neighs)
+                print("Candidate %s" % candidate)
+                # print(path)
+                if candidate in cells_in_maze :
+                    path = cut_loops_in_path(path)
+                    for x in range(len(path)-1):
+                        cell1=path[x]
+                        cell2=path[x+1]
+                        wall_to_remove = set(cell1.walls_pos).intersection(cell2.walls_pos).pop()
+                        cell1.walls_pos.remove(wall_to_remove)
+                        cell2.walls_pos.remove(wall_to_remove)
+                    for c in path :
+                        cells_not_maze.remove(c)
+                        cells_in_maze.add(c)
+                        c.color = VISITED_COLOR
+                    self.update_screen()
+                    break
+
+
+                else :
+                    path.append(candidate)
+                    cell=candidate
+                    print(cell)
+                    self.update_screen(highlight_cells=path)
 
 
 
@@ -219,10 +282,13 @@ class Maze(object):
             print("Bye. Comme back soon !")
             return
         elif resp == '1' :
+            self.reset_grid()
             self.generate_by_random_merge()
         elif resp == '2' :
+            self.reset_grid()
             self.generate_by_depth_first_search()
         elif resp == '3' :
+            self.reset_grid()
             self.generate_by_prims()
     
 #import ipdb; ipdb.set_trace()

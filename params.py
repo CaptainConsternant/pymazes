@@ -4,8 +4,8 @@ from pygame.locals import HWSURFACE, DOUBLEBUF
 
 FLAGS=  HWSURFACE | DOUBLEBUF #| FULLSCREEN
 
-GX = 140
-GY = 140
+GX = 120
+GY = 120
 
 CSIZE = 20
 
