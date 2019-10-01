@@ -10,4 +10,5 @@ pip-selfcheck.json
 pyvenv.cfg
 dump.rdb
 kivy/.buildozer/
+.vscode
 
