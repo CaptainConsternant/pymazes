@@ -28,7 +28,7 @@ class Maze(object):
 
         self.is_generated = False
         self.is_solved = False
-        self.generate_by_wilson()
+        # self.generate_by_wilson()
         self.main_menu()
 
     def reset_grid(self):
@@ -113,6 +113,7 @@ class Maze(object):
                         # print('Wall inside a common zone')
                         return False
         completed_cells = []
+        self.run=True
         while self.run:
             self.poll()
             if not self.pause:
@@ -139,16 +140,18 @@ class Maze(object):
                         pass
                 else :
                     self.run = False
-                    print('end')
-                    self.main_menu()
+                    self.generated = True
 
                 self.update_screen(highlight_cells=[])
+        print('end')
+        return
 
     def generate_by_depth_first_search(self):
         path = LifoQueue()
         visited_cells = []
         current_cell = random.choice(self.cell_list)
         path.put(current_cell)
+        self.run=True
         while self.run:
             self.poll()
             if not self.pause:
@@ -174,9 +177,10 @@ class Maze(object):
                         current_cell = path.get()
 
                     self.update_screen(highlight_cells=list(path.queue))
-
-                print('end')
-                self.main_menu()
+                self.run = False
+                self.generated = True
+        print('end')
+        return
 
     def generate_by_prims(self):
         cells_in_maze = set()
@@ -184,6 +188,7 @@ class Maze(object):
         first_cell = random.choice(self.cell_list)
         [walls_list.add(x) for x in first_cell.walls_pos]
         cells_in_maze.add(first_cell)
+        self.run=True
         while self.run:
             self.poll()
             if not self.pause:
@@ -201,11 +206,14 @@ class Maze(object):
                     walls_list.remove(wall)
                     self.update_screen()
                 
-                print('end')
-                self.main_menu()
+                self.run = False
+        print('end')
+        self.generated = True
+        return
 
 
     def generate_by_wilson(self):
+        # broken
         cells_not_maze = set(self.cell_list)
         cells_in_maze = set()
 
@@ -290,6 +298,7 @@ class Maze(object):
         elif resp == '3' :
             self.reset_grid()
             self.generate_by_prims()
+        self.main_menu()
     
 #import ipdb; ipdb.set_trace()
 
